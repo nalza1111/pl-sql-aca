@@ -1,0 +1,318 @@
+﻿1.
+SELECT *
+FROM   employees
+WHERE  UPPER(job_id) LIKE '%CLERK%'
+AND    hire_date > TO_DATE('2002/12/31','YYYY/MM/DD')
+
+
+
+
+
+
+
+2.
+SELECT   last_name, job_id, salary, commission_pct
+FROM     employees;
+WHERE    commission_pct IS NOT NULL
+ORDER BY 3 DESC;
+
+
+
+
+
+
+
+
+3. 
+SELECT 'The salary of ' || last_name 
+       || 'after a 10% raise is'
+       || ROUND(salary*1.10)
+       AS "New salary"
+FROM   employees
+WHERE  commission_pct IS NULL;
+
+
+SELECT TRUNC(MONTHS_BETWEEN(SYSDATE, hire_date) / 12)
+FROM   employees;
+
+SELECT ROUND(MOD(MONTHS_BETWEEN(SYSDATE, hire_date), 12))
+FROM   employees;
+
+
+
+
+4.
+SELECT last_name, 
+       TRUNC(MONTHS_BETWEEN(sysdate, hire_date)/12) years,
+       TRUNC(MOD(MONTHS_BETWEEN(sysdate, hire_date), 12)) MONTHS
+FROM   employees;
+
+
+
+
+
+
+5. 
+SELECT last_name
+FROM   employees
+WHERE  UPPER(SUBSTR(last_name, 1, 1)) IN ('J','K','L','M');
+
+
+
+
+SELECT last_name
+FROM   employees
+WHERE  last_name LIKE 'J%'
+OR     last_name LIKE 'K%'
+OR     last_name LIKE 'L%'
+OR     last_name LIKE 'M%';
+
+
+
+
+
+
+
+
+6.
+SELECT last_name, salary,
+       DECODE(commission_pct, NULL, 'No',
+                                    'Yes') commission
+FROM   employees;
+
+SELECT last_name, salary,
+       CASE 
+         WHEN commission_pct IS null 
+             THEN 'No'
+         ELSE 'Yes'
+       END AS commission
+FROM   employees;
+
+SELECT last_name, salary,
+       NVL2(commission_pct, 'Yes', 'No') commission
+FROM   employees;
+
+추가문제1)
+  급여가 20000 이하이면 20% 이상된 급여,
+  급여가 30000 이하이면 15% 이상된 급여,  
+  급여가 50000 이하이면 10% 이상된 급여,  
+  급여가 50000 이상이면 급여 그대로 출력되도록 하시오. 
+  단, 사원이름(last_name), 원래급여(salary), 인상된 급여 순서로 출력되도록 하시오.
+
+
+
+
+
+
+
+
+
+
+SELECT last_name, salary,
+       CASE 
+          WHEN salary < 20000 THEN salary*1.20
+          WHEN salary < 30000 THEN salary*1.15
+          WHEN salary < 50000 THEN salary*1.10
+          ELSE salary
+       END AS in_sal
+FROM   employees;
+
+추가문제2)
+  사원들 중 job_id가 ST_CLERK 인 사원은 20% 인상된 급여,
+  그 외의 사원들은 원래 급여 그대로 출력되도록 하시오.
+  단, 사원이름(last_name), 원래급여(salary), 인상된 급여 순서로 출력되도록 하시오.
+
+
+
+
+
+
+
+
+
+
+SELECT last_name, salary,
+       DECODE(job_id, 'ST_CLERK', salary*1.20,
+                                  salary) commission
+FROM   employees;
+
+SELECT last_name, salary,
+       CASE job_id 
+         WHEN 'ST_CLERK' 
+           THEN salary*1.20
+         ELSE salary
+       END commission
+FROM   employees;
+
+
+
+
+
+
+
+
+
+
+
+7. 
+SELECT d.department_name, d.location_id, e.last_name,
+       e.salary, e.job_id
+FROM   employees e, departments d
+WHERE  e.department_id = d.department_id
+AND    d.loction_id = 1800;
+
+
+
+
+
+
+
+
+8.
+SELECT COUNT(*)
+FROM   employees
+WHERE  LOWER(last_name) LIKE '%n';
+
+SELECT COUNT(*)
+FROM   employees
+WHERE  LOWER(SUBSTR(last_name,-1)) = 'n';
+
+
+
+
+
+
+
+
+
+
+9.
+SELECT   d.department_name, d.location_id, COUNT(e.employee_id)
+FROM     employees e, departments d
+WHERE    e.department_id(+) = d.department_id
+GROUP BY d.department_name, d.location_id;
+
+SELECT   d.department_name, d.location_id, COUNT(e.employee_id)
+FROM     employees e RIGHT OUTER JOIN departments d
+                      ON(e.department_id = d.department_id)
+GROUP BY d.department_name, d.location_id;
+
+
+
+
+
+
+
+
+
+
+
+10.
+SELECT DISTINCT job_id
+FROM   employees
+WHERE  department_id IN (10, 20);
+
+
+
+
+
+
+
+
+
+
+
+11.
+SELECT   e.job_id, count(e.job_id) AS frequency
+FROM     employees e, departments d
+WHERE    e.department_id = d.department_id
+AND      LOWER(d.department_name) 
+                        IN ('administration', 'executive')
+GROUP BY e.job_id
+ORDER BY 2 DESC;
+
+SELECT   e.job_id, count(e.job_id) AS frequency
+FROM     employees e JOIN departments d
+               ON(e.department_id = d.department_id)
+WHERE    LOWER(d.department_name) 
+                        IN ('administration', 'executive')
+GROUP BY e.job_id
+ORDER BY 2 DESC;
+
+
+
+
+
+
+
+
+
+
+12.
+SELECT last_name, hire_date
+FROM   employees
+WHERE  TO_CHAR(hire_date, 'DD') < '16';
+
+
+
+
+
+
+
+
+
+
+
+
+13.
+SELECT 	last_name, salary, 
+        TRUNC(salary, -3)/1000 thousands
+FROM    employees;
+
+
+
+
+
+
+
+
+
+
+
+
+
+14.
+SELECT e.last_name, m.last_name MANAGER, m.salary, 
+       j.grade_level GRADE
+FROM   employees e, employees m, job_grades j
+WHERE  e.manager_id = m.employee_id
+AND    m.salary BETWEEN j.lowest_sal AND j.highest_sal
+AND    m.salary > 15000;
+
+SELECT e.last_name, m.last_name MANAGER, m.salary, 
+       j.grade_level GRADE
+FROM   employees e JOIN employees m
+             ON(e.manager_id = m.employee_id)
+                   JOIN job_grades j
+             ON(m.salary BETWEEN j.lowest_sal AND j.highest_sal)
+AND    m.salary > 15000;
+
+
+
+
+
+
+
+
+
+
+
+
+
+15.
+SELECT   department_id, MIN(salary)
+FROM     employees
+GROUP BY department_id
+HAVING   AVG(salary) = (select   max(avg(salary))
+                        from     employees
+                        group by department_id);
