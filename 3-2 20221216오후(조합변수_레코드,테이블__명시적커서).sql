@@ -76,7 +76,7 @@ begin
     end loop;
 end;
 /
---3-7
+--3-7 넘버 테이블
 declare
     type dept_table_type is table of number
         index by binary_integer;
