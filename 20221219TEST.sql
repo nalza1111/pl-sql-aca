@@ -157,22 +157,27 @@ select * from employees;
 
 --3 뒤에 보기
 declare
-    cursor c_emp_cursor is
-        select * from employees
+    cursor c_emp_cursor
+    is
+        select employee_id, salary
+            from employees
             where department_id = &id;
     e_name exception;
+    emp_rec c_emp_cursor%rowtype;
 begin
-    for emp_v_list in c_emp_cursor
-    loop
-        update employees set salary = salary * 1.1
-            where department_id = emp_v_list.department_id;
-            dbms_output.put_line(c_emp_cursor%rowcount);
-    end loop;
     open c_emp_cursor;
-    dbms_output.put_line(c_emp_cursor%rowcount);
+        loop
+            fetch c_emp_cursor into emp_rec;
+            exit when c_emp_cursor%notfound;
+            update employees
+                set salary = emp_rec.salary * 1.1
+                where employee_id = emp_rec.employee_id;
+           dbms_output.put_line(sql%rowcount||'건 수정');
+        end loop;
     if c_emp_cursor%rowcount=0  then
         raise e_name;
     end if;
+    close c_emp_cursor;
     exception
     when e_name then
         dbms_output.put_line('해당 부서에 사원없음');
@@ -181,11 +186,33 @@ end;
 /
 select * from employees;
 
+--사원번호를 입력할 경우
+--삭제하는 TEST_PRO 프로시저를 생성하시오.
+--단, 해당사원이 없는 경우 "해당사원이 없습니다." 출력
+--예) EXECUTE TEST_PRO(176)
 
-
-
-
-
+create or replace procedure test_pro
+    (p_id in employees.employee_id%type)
+is  
+    e_child exception;
+    PRAGMA EXCEPTION_INIT (e_child, -02292);
+    e_noid exception;
+begin
+    delete from employees
+        where employee_id=p_id;
+    if sql%notfound then
+        raise e_noid; 
+    end if;
+    DBMS_OUTPUT.PUT_LINE(sql%rowcount||'건 삭제');
+exception
+      when e_child then
+      DBMS_OUTPUT.PUT_line('child record 있어 삭제x');
+      when e_noid then
+      DBMS_OUTPUT.PUT_line('해당사원이 없습니다');
+end TEST_PRO;
+/
+execute test_pro(&id);
+select employee_id from employees;
 
 
 

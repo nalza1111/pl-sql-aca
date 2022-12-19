@@ -1,6 +1,6 @@
 --초기화 해주기..
 set SERVEROUTPUT ON
--- 명시적 커서 + for loop를 사용하기
+-- 명시적 커서 + for loop를 사용하기..for loop암시적커서 닫음
 declare
     cursor c_emp_cursor is
         select employee_id, last_name from employees;
@@ -10,7 +10,7 @@ begin
     loop
         dbms_output.put_line(emp_record.employee_id
                              ||' ' ||emp_record.last_name);
-    end loop;
+    end loop; --암시적커서 닫음
 end;
 /
 -- 금요일 오후 문제 for loop로 바꾸기
@@ -30,9 +30,11 @@ begin
     end loop;
 end;
 /
-select * from test01;
-truncate table test02;
---커서선언없이 서브쿼리로 사용하기(declare가 필요 없어짐..but %isoften %rowcount같은건 못 씀)
+select * from test02;
+truncate table test01;
+
+-- 커서선언없이 서브쿼리로 사용하기..
+-- declare가 필요 없음 ..but %isopen %rowcount등의 커서속성은 쓸 수 없음
 begin 
     for emp_record in (select employee_id, first_name, hire_date
                         from employees)
@@ -65,7 +67,7 @@ begin
     close emp_cursor;
 end;
 /
---where currnet of 절(책) ?
+--where current of 절(책) ?
 declare
     cursor sal_cursor is
         select salary
@@ -83,7 +85,7 @@ end;
 /
 select * from employees;
 
---예외트랩
+--예외트랩( too many rows사용)
 declare
     v_lname varchar2(15);
 begin
@@ -95,7 +97,7 @@ begin
         dbms_output.put_line('Too many rows'); --
 end;
 /
---예외정의
+--예외정의(-ORA 번호사용) -01400 널
 declare
     e_insert_excep exception;
     pragma exception_init(e_insert_excep, -01400);
@@ -108,7 +110,7 @@ begin
             dbms_output.put_line('오류');
 end;
 /
---예외처리2
+--예외처리2(사용자정의1)
 declare
     v_deptno number := 500;
     v_name varchar2(20) := 'Testing';
@@ -126,7 +128,7 @@ begin
         dbms_output.put_line('no such~~');
 end;
 /
---예외처리 내장(raise)
+--예외처리 내장(raise)(사용자정의2)
 declare
     e_name exception;
 begin
@@ -137,10 +139,11 @@ begin
     end if;
     exception
     when e_name then
-        --plspl 실행안됨
+        -- 실행안됨
         --raise_application_error (-20999, '해당사원이 없습니다'); 
-        --이건 plspl실행됨
-        dbms_output.put_line('해당사원xx'); --이건 실행 됨
+    
+        --이건 실행 됨
+        dbms_output.put_line('해당사원xx'); 
 end;
 /
 --(2)

@@ -1,4 +1,4 @@
---In 프로시져
+--IN 프로시져
 create procedure raise_salary
     (   p_id        in employees.employee_id%type,
         p_percent   in number)
@@ -17,7 +17,7 @@ begin
     raise_salary(200, 10);
 end;
 /
---Out 매개변수
+--OUT 매개변수
 create or replace procedure query_emp
     (   p_id        in employees.employee_id%type,
         p_name      out employees.last_name%type,
@@ -34,11 +34,11 @@ declare
     v_emp_sal   employees.salary%type;
 begin
     query_emp(100, v_emp_name, v_emp_sal);
-    dbms_output.put_line(v_emp_name ||' ears '||
+    dbms_output.put_line(v_emp_name ||' earns '||
         to_char(v_emp_sal, '$999,999.00'));
 end;
 /
---Out2 전화번호 출력 --> 64페이지 밑에 부분 sql러너로 실행
+--INOUT 전화번호 출력 --> 64페이지 밑에 부분 sql러너로 실행
 CREATE or replace procedure format_phone
     (p_phone_no in out varchar2)
 is
@@ -75,7 +75,8 @@ execute add_dept(p_loc=>2500, p_name=>'EDUCATION');
 --프로시져 중첩
 select employee_id, salary from employees;
 
-create or replace procedure process_emps -- 매개변수가 없음--실행만하면돌아감
+-- 매개변수가 없음--실행만하면돌아감
+create or replace procedure process_emps 
 is --여기까지 헤더 ...헤더와 비긴사이에 일반변수선언 못함!!!
     cursor emp_cursor
     is
@@ -88,7 +89,8 @@ begin --여기서 실행
     end loop;
 end process_emps;
 /
-execute process_employees;
+--매개변수 없이 프로시져사용
+execute process_emps;
 /
 --76페이지 익셉션 아더스
 create or replace procedure add_department(
@@ -107,7 +109,7 @@ exception --
     DBMS_OUTPUT.PUT_line('err: adding depg:' || p_name);     -- 요기 세줄 주석처리하면 ...
 end;
 /
-create procedure create_departments
+create or replace procedure create_departments
 is
 begin
     add_department('Media', 100, 1800);
