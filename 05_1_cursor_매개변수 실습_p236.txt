@@ -1,0 +1,18 @@
+DECLARE
+  v_empno employees.employee_id%TYPE;
+  v_ename employees.last_name%TYPE;
+  CURSOR emp_cursor (v_deptno NUMBER, v_job VARCHAR2) IS
+    SELECT employee_id, last_name
+    FROM   employees
+    WHERE  department_id = v_deptno
+    AND    job_id = v_job;
+BEGIN
+  OPEN emp_cursor(60, ¡®IT_PROG¡¯);
+    LOOP
+      FETCH emp_cursor INTO v_empno, v_ename;
+        EXIT WHEN emp_cursor%NOTFOUND;
+      DBMS_OUTPUT.PUT_LINE(TO_CHAR(v_empno)||¡® ¡¯|| v_ename);
+    END LOOP;
+  CLOSE emp_cursor;
+END;
+/
