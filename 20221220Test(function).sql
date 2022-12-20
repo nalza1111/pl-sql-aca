@@ -94,7 +94,7 @@ create or replace function y_yedam
         into v_fname, v_lname
         from employees
         where employee_id = p_id;
-        return v_fname ||' '|| v_lname;
+        return v_fname ||' '|| v_lname; --concat(v_fname ||' '|| v_lname)
     end y_yedam;
     /
 SELECT employee_id, y_yedam(employee_id)
@@ -122,7 +122,7 @@ create or replace function y_dept
         where e.department_id = d.department_id(+)
         and e.employee_id = p_id;
         DBMS_OUTPUT.PUT_LINE('안에서'||v_dept);
-        if v_dept is null then 
+        if v_dept is null then     -- +로 조인해서 없는 쪽에 is null!!!!
             raise nullex;
         end if;
         
@@ -146,7 +146,7 @@ create or replace function y_test
     is
         cursor emp_list_cursor
         is  
-            select e.first_name as "A", d.department_name as "B"
+            select e.first_name as "A", d.department_name as "B"  -- 대문자로 안하면 오류나더라
                 from employees e, departments d
                 where e.department_id = d.department_id
                 and e.department_id = p_deptid;   
