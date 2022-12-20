@@ -186,40 +186,21 @@ end;
 /
 select * from employees;
 
---사원번호를 입력할 경우
---삭제하는 TEST_PRO 프로시저를 생성하시오.
---단, 해당사원이 없는 경우 "해당사원이 없습니다." 출력
---예) EXECUTE TEST_PRO(176)
 
-create or replace procedure test_pro
-    (p_id in employees.employee_id%type)
-is  
-    e_child exception;
-    PRAGMA EXCEPTION_INIT (e_child, -02292);
-    e_noid exception;
+
+--&&두개 이용
+declare
+    v_emp   employees.employee_id%type;
 begin
+    select employee_id into v_emp
+        from employees
+        where employee_id = &&p_id;
     delete from employees
-        where employee_id=p_id;
-    if sql%notfound then
-        raise e_noid; 
-    end if;
-    DBMS_OUTPUT.PUT_LINE(sql%rowcount||'건 삭제');
-exception
-      when e_child then
-      DBMS_OUTPUT.PUT_line('child record 있어 삭제x');
-      when e_noid then
-      DBMS_OUTPUT.PUT_line('해당사원이 없습니다');
-end TEST_PRO;
+        where employee_id = &p_id;
+end;
 /
-execute test_pro(&id);
-select employee_id from employees;
-
-
-
-
-
-
-
+select * from employees;
+delete from employees where employee_id = 141;
 
 
 
